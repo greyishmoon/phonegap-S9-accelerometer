@@ -1,4 +1,5 @@
 var watchID;
+var prevTimeStamp;
 var accelerometerOptions = {
     frequency: 2000
 }; // Update every 2 seconds
@@ -45,6 +46,10 @@ function accelerometerSuccess(acceleration) {
     // convert to formated time string
     var time = date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
 	$('#timestamp').val(time);
+	// Display delay since last accelration packet
+	$('#delay').val(domTimeStamp - prevTimeStamp);
+
+	prevTimeStamp = domTimeStamp;
 }
 
 function accelerometerError() {
