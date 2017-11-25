@@ -1,41 +1,32 @@
 var watchID;
-var accelerometerOptions = { frequency: 2000 };  // Update every 2 seconds
+var accelerometerOptions = {
+    frequency: 2000
+}; // Update every 2 seconds
 accelerometerOptions.frequency = 3000; //changed my mind - now 3 seconds
 
-
 //when the page is created...
-$(document).on("pagecreate", "#page1", function () {
-	
-	//setup listener for the toggle switch
-	$("#flipswitch").on("change", function() {
-		
-		if( $(this).val() == "on" ) startSensor();
-		else if ( $(this).val() == "off" ) stopSensor();
+$(document).on("pagecreate", "#page1", function() {
+    //setup listener for the toggle switch
+    $("#flipswitch").on("change", function() {
+        if ($(this).val() == "on") startSensor();
+        else if ($(this).val() == "off") stopSensor();
+    });
 
-	});
-	
-	//setup listener for the slider
-	$("#slider").on("slidestop", function() {
-		
-		
-		//the value from the slider is text - it needs to be turned into an integer
-		var freq = parseInt($(this).val());
-		
-		updateFreq(freq);
-	
-	});
-	
+    //setup listener for the slider
+    $("#slider").on("slidestop", function() {
+        //the value from the slider is text - it needs to be turned into an integer
+        var freq = parseInt($(this).val());
+
+        updateFreq(freq);
+    });
 });
-
 
 function startSensor() {
 	watchID = navigator.accelerometer.watchAcceleration( accelerometerSuccess, accelerometerError, accelerometerOptions);
 }
 
-
 function stopSensor() {
 	navigator.accelerometer.clearWatch(watchID);
-			
 	$('#sensorX').val("");
 	$('#sensorY').val("");
 	$('#sensorZ').val("");
@@ -43,12 +34,17 @@ function stopSensor() {
 }
 
 function accelerometerSuccess(acceleration) {
-	
 	$('#sensorX').val(acceleration.x);
 	$('#sensorY').val(acceleration.y);
 	$('#sensorZ').val(acceleration.z);
-	$('#timestamp').val(acceleration.timestamp);
-
+	// DATE + TIME
+    // position.timestamp returuns type domTimeStamp
+	var domTimeStamp = acceleration.timestamp;
+    // convert domTimeStamp to Date which browsers recognise
+    var date = new Date(domTimeStamp);
+    // convert to formated time string
+    var time = date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+	$('#timestamp').val(time);
 }
 
 function accelerometerError() {
@@ -57,6 +53,12 @@ function accelerometerError() {
 
 function updateFreq(freq) {
 	//do something to update freq. here.
+    // Added code: change frequency to new slider value
+    stopSensor();
+    accelerometerOptions.frequency = freq; // alter frequency for restart
+    startSensor();
+	// turn toggle switch on
+	$("#flipswitch").val("on").slider("refresh");
 }
 
 
@@ -81,15 +83,15 @@ function updateFreq(freq) {
 //
 //// Cordova device event listener - will not work in browser
 //document.addEventListener("deviceready", onDeviceReady, false);
-//		
+//
 //// Cordova device event triggered function
 //function onDeviceReady() {
-//	
+//
 //	// Add other event listeners here if needed (pause, resume, backbutton etc)
-//	
-//    // updates display    
+//
+//    // updates display
 //	// updateDisplay();
-//	    
+//
 //	console.log("device ready");
 //}
 //
@@ -105,7 +107,7 @@ function updateFreq(freq) {
 //function onReady( jQuery  ) {
 //    // MAIN CODE HERE
 //    console.log("onReady");
-//    
+//
 //    updateDisplay();
 //}
 //
